@@ -9,12 +9,20 @@
         body { background-color: #000; color: #fff; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .video-card:hover { transform: translateY(-5px); border-color: #f97316; }
+        .stat-badge { background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.3); }
     </style>
 </head>
 <body class="font-sans">
 
-    <nav class="sticky top-0 z-50 glass px-6 py-5 flex justify-center items-center">
+    <nav class="sticky top-0 z-50 glass px-6 py-4 flex flex-col items-center gap-2">
         <h1 class="text-3xl font-black tracking-tighter text-orange-500">LANKA<span class="bg-orange-500 text-black px-1.5 rounded ml-1">HUB</span></h1>
+        
+        <div class="stat-badge px-4 py-1 rounded-full flex items-center gap-2">
+            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            <span class="text-[11px] font-bold text-orange-200 uppercase tracking-widest">
+                Total Visitors: <span id="visitorCount">...</span>
+            </span>
+        </div>
     </nav>
 
     <main class="max-w-7xl mx-auto p-6">
@@ -23,16 +31,34 @@
         </h2>
 
         <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            <p class="text-zinc-500">පූරණය වෙමින් පවතී...</p>
+            <p class="text-zinc-500 text-center col-span-full">පූරණය වෙමින් පවතී...</p>
         </div>
     </main>
 
     <script>
-        // GitHub විස්තර
         const REPO_OWNER = 'Yuresh-Official'; 
         const REPO_NAME = 'hub'; 
         const FILE_PATH = 'videos.json';
 
+        // 1. Visitor Counter එක වැඩ කරන හැටි
+        // සටහන: මෙය Unique Visitors පෙන්වීමට Tinybird හෝ එවැනි API එකක් භාවිතා කරයි.
+        // දැනට සරලම ක්‍රමය ලෙස localStorage භාවිතයෙන් මෙය පෙන්වමු.
+        function setupVisitorCount() {
+            let count = localStorage.getItem('visitor_count') || 0;
+            
+            // පළමු වතාවට එන කෙනෙක් නම් පමණක් count එක වැඩි කරන්න
+            if (!sessionStorage.getItem('is_new_session')) {
+                count = parseInt(count) + 1;
+                localStorage.setItem('visitor_count', count);
+                sessionStorage.setItem('is_new_session', 'true');
+            }
+            
+            // සැබෑ ලෝකයේදී මීට වඩා දියුණු API එකක් අවශ්‍යයි, 
+            // දැනට ඔයාගේ Browser එකේ කී දෙනෙක් ආවද කියලා පෙන්වන්න:
+            document.getElementById('visitorCount').innerText = count;
+        }
+
+        // 2. වීඩියෝ ලෝඩ් කරන හැටි
         async function loadVideos() {
             const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${FILE_PATH}`;
             try {
@@ -42,40 +68,38 @@
                 const grid = document.getElementById('videoGrid');
                 grid.innerHTML = '';
 
-                videos.reverse().forEach((v, index) => {
-                    // පින්තූරයක්ද වීඩියෝවක්ද බලනවා
+                videos.reverse().forEach((v) => {
                     const isImage = v.link.match(/\.(jpeg|jpg|gif|png)$/) != null || v.link.includes('tenor.com');
                     
-                    // Card එකක් සාදා එය Click කල විට වීඩියෝ එකේ ලින්ක් එකට යාමට සලස්වනවා
                     const card = document.createElement('div');
                     card.className = "video-card group cursor-pointer bg-zinc-900/40 rounded-[2rem] overflow-hidden border border-white/5 p-3 transition-all duration-300";
-                    
-                    // Card එක Click කල විට අලුත් පේජ් එකක ලින්ක් එක විවෘත වේ
                     card.onclick = () => window.open(v.link, '_blank');
 
                     card.innerHTML = `
                         <div class="relative aspect-video rounded-2xl overflow-hidden bg-black">
                             ${isImage ? 
                                 `<img src="${v.link}" class="w-full h-full object-cover">` : 
-                                `<div class="w-full h-full flex items-center justify-center bg-zinc-800 text-zinc-500">Video Player</div>`
+                                `<div class="w-full h-full flex items-center justify-center bg-zinc-800 text-zinc-500">Watch Video</div>`
                             }
-                            <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition">
+                            <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition">
                                 <span class="bg-orange-500 text-black font-bold px-4 py-2 rounded-full text-xs">WATCH NOW</span>
                             </div>
                         </div>
-                        <div class="p-4">
+                        <div class="p-4 text-center">
                             <h3 class="font-semibold text-zinc-100 text-base leading-tight group-hover:text-orange-500 transition">${v.title}</h3>
-                            <p class="text-[10px] text-zinc-500 mt-2 uppercase tracking-widest">Click to view</p>
                         </div>`;
                     
                     grid.appendChild(card);
                 });
             } catch (e) {
-                document.getElementById('videoGrid').innerHTML = '<p class="text-zinc-500">වීඩියෝ සොයා ගැනීමට නොහැකි විය.</p>';
+                document.getElementById('videoGrid').innerHTML = '<p class="text-zinc-500 text-center col-span-full">වීඩියෝ සොයා ගැනීමට නොහැකි විය.</p>';
             }
         }
 
-        window.onload = loadVideos;
+        window.onload = () => {
+            loadVideos();
+            setupVisitorCount();
+        };
     </script>
 </body>
 </html>
