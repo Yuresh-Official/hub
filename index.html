@@ -17,53 +17,22 @@
             transition: opacity 1s ease-out;
         }
 
-        /* ඔංචිල්ලාව (Swing) CSS වලින් */
         .swing-container {
             position: relative; width: 200px; height: 250px;
             transform-origin: top center;
             animation: moveSwing 3s ease-in-out infinite;
         }
 
-        .rope {
-            position: absolute; width: 4px; height: 180px;
-            background: #78350f; top: 0;
-        }
+        .rope { position: absolute; width: 4px; height: 180px; background: #78350f; top: 0; }
         .rope-left { left: 40px; }
         .rope-right { right: 40px; }
-
-        .seat {
-            position: absolute; bottom: 65px; left: 30px;
-            width: 140px; height: 10px; background: #92400e;
-            border-radius: 5px;
-        }
-
-        /* කාන්තාවගේ Silhouette එක (සරලව) */
-        .person {
-            position: absolute; bottom: 75px; left: 70px;
-            width: 60px; height: 100px;
-            background: #b91c1c; border-radius: 30px 30px 0 0; /* Osari Style Red */
-        }
-        .head {
-            position: absolute; top: -35px; left: 15px;
-            width: 30px; height: 30px; background: #b91c1c; border-radius: 50%;
-        }
+        .seat { position: absolute; bottom: 65px; left: 30px; width: 140px; height: 10px; background: #92400e; border-radius: 5px; }
+        .person { position: absolute; bottom: 75px; left: 70px; width: 60px; height: 100px; background: #b91c1c; border-radius: 30px 30px 0 0; }
+        .head { position: absolute; top: -35px; left: 15px; width: 30px; height: 30px; background: #b91c1c; border-radius: 50%; }
 
         @keyframes moveSwing {
             0%, 100% { transform: rotate(-15deg); }
             50% { transform: rotate(15deg); }
-        }
-
-        /* රබන් (Raban) Animation */
-        .raban {
-            width: 80px; height: 80px; border: 8px solid #92400e;
-            border-radius: 50%; background: #fde68a;
-            position: absolute; bottom: 20px; right: -100px;
-            animation: hitRaban 0.5s ease-in-out infinite;
-        }
-
-        @keyframes hitRaban {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); box-shadow: 0 0 20px #f59e0b; }
         }
 
         .wishes {
@@ -76,8 +45,6 @@
             from { text-shadow: 0 0 5px #fff; }
             to { text-shadow: 0 0 20px #fbbf24; transform: scale(1.05); }
         }
-
-        .koha-text { color: #b91c1c; font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body class="font-sans">
@@ -88,73 +55,99 @@
             <div class="rope rope-right"></div>
             <div class="seat"></div>
             <div class="person"><div class="head"></div></div>
-            <div class="raban"></div>
         </div>
         <h1 class="wishes">සුබ අලුත් අවුරුද්දක් වේවා!</h1>
-        <p class="koha-text">කෝ... කොහ්... කෝ... කොහ්... 🦜</p>
+        <p class="text-red-700 font-bold mt-2">🦜 කෝ... කොහ්... කෝ... කොහ්...</p>
     </div>
 
     <nav class="sticky top-0 z-50 glass px-6 py-4 flex flex-col items-center gap-2">
         <h1 class="text-3xl font-black tracking-tighter text-orange-500">LANKA<span class="bg-orange-500 text-black px-1.5 rounded ml-1">HUB</span></h1>
-        <div class="stat-badge text-xs font-bold text-orange-200">
-            Total Visitors: <span id="visitorCount">...</span>
+        <div class="bg-orange-500/10 border border-orange-500/30 px-4 py-1 rounded-full">
+            <span id="visitorCount" class="text-xs font-bold text-orange-500 uppercase tracking-widest">Visitors: 0</span>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto p-6">
+    <main class="max-w-7xl mx-auto p-6 mt-6">
         <h2 class="text-xl font-bold mb-10 flex items-center gap-2">
             <span class="w-1.5 h-6 bg-orange-500 rounded-full"></span> අලුත්ම නිර්මාණ
         </h2>
-        <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 text-center">
+        
+        <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             </div>
     </main>
 
     <script>
+        // --- 1. GitHub Configurations ---
         const REPO_OWNER = 'Yuresh-Official'; 
         const REPO_NAME = 'hub'; 
         const FILE_PATH = 'videos.json';
 
+        // --- 2. Load Content with Styles ---
+        async function loadVideos() {
+            const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${FILE_PATH}`;
+            try {
+                const res = await fetch(url + "?t=" + new Date().getTime());
+                if (!res.ok) throw new Error();
+                const videos = await res.json();
+                const grid = document.getElementById('videoGrid');
+                grid.innerHTML = '';
+
+                videos.reverse().forEach(v => {
+                    // Check if it's an image or direct video link
+                    const isImage = v.link.match(/\.(jpeg|jpg|gif|png)$/) != null || v.link.includes('tenor.com') || v.link.includes('media.tenor.com');
+                    
+                    const card = document.createElement('div');
+                    card.className = "bg-zinc-900/60 rounded-[2rem] overflow-hidden border border-white/10 cursor-pointer hover:border-orange-500 transition-all duration-300 group";
+                    card.onclick = () => window.open(v.link, '_blank');
+
+                    card.innerHTML = `
+                        <div class="relative aspect-video w-full overflow-hidden bg-black">
+                            ${isImage ? 
+                                `<img src="${v.link}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">` : 
+                                `<div class="w-full h-full flex items-center justify-center bg-zinc-800 text-zinc-500 font-bold italic">Watch Video</div>`
+                            }
+                            <div class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition">
+                                <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition duration-300">
+                                    <span class="text-black ml-1 text-xl">▶</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6 text-center">
+                            <h3 class="font-bold text-zinc-100 text-lg leading-snug group-hover:text-orange-500 transition duration-300">${v.title}</h3>
+                            <p class="text-orange-500/70 text-[10px] mt-2 font-bold uppercase tracking-widest">Click to View Content</p>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (e) {
+                document.getElementById('videoGrid').innerHTML = '<p class="text-zinc-500 col-span-full text-center py-10">වීඩියෝ පූරණය කළ නොහැකි විය. (videos.json පරීක්ෂා කරන්න)</p>';
+            }
+        }
+
+        // --- 3. Visitor Count ---
+        function setupVisitorCount() {
+            let count = localStorage.getItem('v_count') || 1;
+            if (!sessionStorage.getItem('s')) {
+                count = parseInt(count) + 1;
+                localStorage.setItem('v_count', count);
+                sessionStorage.setItem('s', '1');
+            }
+            document.getElementById('visitorCount').innerText = "Total Visitors: " + count;
+        }
+
+        // --- 4. Page Initialization ---
         window.onload = () => {
             loadVideos();
             setupVisitorCount();
             
-            // තත්පර 4කට පසු Splash Screen එක අයින් කරයි
+            // Hide Splash screen after 4 seconds
             setTimeout(() => {
                 const splash = document.getElementById('splashScreen');
                 splash.style.opacity = '0';
                 setTimeout(() => splash.style.display = 'none', 1000);
             }, 4000);
         };
-
-        async function loadVideos() {
-            const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${FILE_PATH}`;
-            try {
-                const res = await fetch(url + "?t=" + new Date().getTime());
-                const videos = await res.json();
-                const grid = document.getElementById('videoGrid');
-                grid.innerHTML = '';
-
-                videos.reverse().forEach(v => {
-                    const card = document.createElement('div');
-                    card.className = "bg-zinc-900/50 p-6 rounded-[2rem] border border-white/5 cursor-pointer hover:border-orange-500 transition-all";
-                    card.onclick = () => window.open(v.link, '_blank');
-                    card.innerHTML = `<h3 class="font-bold text-zinc-200">${v.title}</h3><p class="text-orange-500 text-[10px] mt-2 italic">Click to watch</p>`;
-                    grid.appendChild(card);
-                });
-            } catch (e) {
-                document.getElementById('videoGrid').innerHTML = '<p class="text-zinc-500">වීඩියෝ පූරණය කළ නොහැකි විය.</p>';
-            }
-        }
-
-        function setupVisitorCount() {
-            let count = localStorage.getItem('v_count') || 10; // Default අගයක්
-            if (!sessionStorage.getItem('s')) {
-                count = parseInt(count) + 1;
-                localStorage.setItem('v_count', count);
-                sessionStorage.setItem('s', '1');
-            }
-            document.getElementById('visitorCount').innerText = count;
-        }
     </script>
 </body>
 </html>
