@@ -3,69 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LankaHub - Videos</title>
+    <title>LankaHub - Avurudu Special</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #000; color: #fff; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        
-        /* අවුරුදු Splash Screen */
+
+        /* --- අවුරුදු Splash Screen --- */
         #splashScreen {
             position: fixed; inset: 0; 
-            background: linear-gradient(to bottom, #fde68a, #f97316); /* අවුරුදු තේමාවට කහ සහ තැඹිලි */
+            background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 50%, #f59e0b 100%);
             z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 1s ease-out;
         }
-        
-        .avurudu-container { text-align: center; position: relative; }
-        
-        /* ඔංචිලි පදින ඇනිමේෂන් එකක් වැනි චලනයක් */
-        .swing-girl {
-            width: 280px; height: auto;
-            animation: avuruduSwing 3s ease-in-out infinite;
+
+        /* ඔංචිල්ලාව (Swing) CSS වලින් */
+        .swing-container {
+            position: relative; width: 200px; height: 250px;
+            transform-origin: top center;
+            animation: moveSwing 3s ease-in-out infinite;
         }
-        
-        @keyframes avuruduSwing {
-            0% { transform: rotate(-10deg) translateY(0); }
-            50% { transform: rotate(10deg) translateY(-20px); }
-            100% { transform: rotate(-10deg) translateY(0); }
+
+        .rope {
+            position: absolute; width: 4px; height: 180px;
+            background: #78350f; top: 0;
+        }
+        .rope-left { left: 40px; }
+        .rope-right { right: 40px; }
+
+        .seat {
+            position: absolute; bottom: 65px; left: 30px;
+            width: 140px; height: 10px; background: #92400e;
+            border-radius: 5px;
+        }
+
+        /* කාන්තාවගේ Silhouette එක (සරලව) */
+        .person {
+            position: absolute; bottom: 75px; left: 70px;
+            width: 60px; height: 100px;
+            background: #b91c1c; border-radius: 30px 30px 0 0; /* Osari Style Red */
+        }
+        .head {
+            position: absolute; top: -35px; left: 15px;
+            width: 30px; height: 30px; background: #b91c1c; border-radius: 50%;
+        }
+
+        @keyframes moveSwing {
+            0%, 100% { transform: rotate(-15deg); }
+            50% { transform: rotate(15deg); }
+        }
+
+        /* රබන් (Raban) Animation */
+        .raban {
+            width: 80px; height: 80px; border: 8px solid #92400e;
+            border-radius: 50%; background: #fde68a;
+            position: absolute; bottom: 20px; right: -100px;
+            animation: hitRaban 0.5s ease-in-out infinite;
+        }
+
+        @keyframes hitRaban {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); box-shadow: 0 0 20px #f59e0b; }
         }
 
         .wishes {
-            font-size: 2.5rem; font-weight: 900; color: #7c2d12;
-            margin-top: 20px; text-shadow: 0 2px 10px rgba(255,255,255,0.5);
-            animation: pulse 1.5s infinite;
+            font-size: 2.8rem; font-weight: 900; color: #7c2d12;
+            margin-top: 40px; text-align: center;
+            animation: textGlow 1.5s ease-in-out infinite alternate;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        @keyframes textGlow {
+            from { text-shadow: 0 0 5px #fff; }
+            to { text-shadow: 0 0 20px #fbbf24; transform: scale(1.05); }
         }
+
+        .koha-text { color: #b91c1c; font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body class="font-sans">
 
     <div id="splashScreen">
-        <div class="avurudu-container">
-            <img src="https://i.ibb.co/LzNf9Pz/avurudu-cartoon.png" onerror="this.src='https://media.tenor.com/fXjXU0iO34sAAAAC/sinhala-new-year-subha-aluth-avuruddak-wewa.gif'" class="swing-girl">
-            <h1 class="wishes">සුබ අලුත් අවුරුද්දක් වේවා!</h1>
-            <p class="text-orange-900 font-bold mt-2">රබන් සුරල් මැදින් කොහා ඇහෙන අවුරුද්දක්...</p>
+        <div class="swing-container">
+            <div class="rope rope-left"></div>
+            <div class="rope rope-right"></div>
+            <div class="seat"></div>
+            <div class="person"><div class="head"></div></div>
+            <div class="raban"></div>
         </div>
-        
-        <audio id="kohaSound" loop>
-            <source src="https://www.soundboard.com/handler/DownLoadTrack.ashx?cliptoken=... " type="audio/mpeg">
-        </audio>
+        <h1 class="wishes">සුබ අලුත් අවුරුද්දක් වේවා!</h1>
+        <p class="koha-text">කෝ... කොහ්... කෝ... කොහ්... 🦜</p>
     </div>
 
     <nav class="sticky top-0 z-50 glass px-6 py-4 flex flex-col items-center gap-2">
         <h1 class="text-3xl font-black tracking-tighter text-orange-500">LANKA<span class="bg-orange-500 text-black px-1.5 rounded ml-1">HUB</span></h1>
-        <div class="bg-orange-500/10 border border-orange-500/30 px-4 py-1 rounded-full">
-            <span id="visitorCount" class="text-xs font-bold text-orange-500 uppercase">Visitors: ...</span>
+        <div class="stat-badge text-xs font-bold text-orange-200">
+            Total Visitors: <span id="visitorCount">...</span>
         </div>
     </nav>
 
     <main class="max-w-7xl mx-auto p-6">
-        <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <h2 class="text-xl font-bold mb-10 flex items-center gap-2">
+            <span class="w-1.5 h-6 bg-orange-500 rounded-full"></span> අලුත්ම නිර්මාණ
+        </h2>
+        <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 text-center">
             </div>
     </main>
 
@@ -74,16 +114,16 @@
         const REPO_NAME = 'hub'; 
         const FILE_PATH = 'videos.json';
 
-        // Splash screen එක අයින් කිරීම
         window.onload = () => {
             loadVideos();
             setupVisitorCount();
             
+            // තත්පර 4කට පසු Splash Screen එක අයින් කරයි
             setTimeout(() => {
                 const splash = document.getElementById('splashScreen');
                 splash.style.opacity = '0';
                 setTimeout(() => splash.style.display = 'none', 1000);
-            }, 4000); // තත්පර 4ක් පෙන්වයි
+            }, 4000);
         };
 
         async function loadVideos() {
@@ -93,24 +133,27 @@
                 const videos = await res.json();
                 const grid = document.getElementById('videoGrid');
                 grid.innerHTML = '';
+
                 videos.reverse().forEach(v => {
                     const card = document.createElement('div');
-                    card.className = "bg-zinc-900/50 p-4 rounded-3xl border border-white/5 cursor-pointer hover:border-orange-500 transition-all";
+                    card.className = "bg-zinc-900/50 p-6 rounded-[2rem] border border-white/5 cursor-pointer hover:border-orange-500 transition-all";
                     card.onclick = () => window.open(v.link, '_blank');
-                    card.innerHTML = `<h3 class="text-center font-bold">${v.title}</h3>`;
+                    card.innerHTML = `<h3 class="font-bold text-zinc-200">${v.title}</h3><p class="text-orange-500 text-[10px] mt-2 italic">Click to watch</p>`;
                     grid.appendChild(card);
                 });
-            } catch (e) { console.log("Load error"); }
+            } catch (e) {
+                document.getElementById('videoGrid').innerHTML = '<p class="text-zinc-500">වීඩියෝ පූරණය කළ නොහැකි විය.</p>';
+            }
         }
 
         function setupVisitorCount() {
-            let count = localStorage.getItem('v_count') || 0;
+            let count = localStorage.getItem('v_count') || 10; // Default අගයක්
             if (!sessionStorage.getItem('s')) {
-                count++;
+                count = parseInt(count) + 1;
                 localStorage.setItem('v_count', count);
                 sessionStorage.setItem('s', '1');
             }
-            document.getElementById('visitorCount').innerText = "Total Visitors: " + count;
+            document.getElementById('visitorCount').innerText = count;
         }
     </script>
 </body>
