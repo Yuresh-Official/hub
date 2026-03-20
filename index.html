@@ -3,121 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LankaHub - Videos & GIFs</title>
+    <title>LankaHub - Videos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #000; color: #fff; scroll-behavior: smooth; }
+        body { background-color: #000; color: #fff; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .ios-modal { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; }
-        .ios-modal.active { display: flex; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .video-card:hover { transform: translateY(-5px); border-color: #f97316; }
     </style>
 </head>
 <body class="font-sans">
 
-    <nav class="sticky top-0 z-50 glass px-6 py-4 flex justify-between items-center">
-        <h1 class="text-2xl font-black tracking-tighter text-orange-500">LANKA<span class="bg-orange-500 text-black px-1.5 rounded ml-1">HUB</span></h1>
-        <button onclick="toggleModal()" class="bg-orange-500 text-black font-bold px-5 py-2 rounded-full text-sm">+ Upload</button>
+    <nav class="sticky top-0 z-50 glass px-6 py-5 flex justify-center items-center">
+        <h1 class="text-3xl font-black tracking-tighter text-orange-500">LANKA<span class="bg-orange-500 text-black px-1.5 rounded ml-1">HUB</span></h1>
     </nav>
 
     <main class="max-w-7xl mx-auto p-6">
-        <h2 class="text-xl font-bold mb-8 flex items-center gap-2">
+        <h2 class="text-xl font-bold mb-10 flex items-center gap-2">
             <span class="w-1.5 h-6 bg-orange-500 rounded-full"></span> අලුත්ම නිර්මාණ
         </h2>
+
         <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            <p class="text-zinc-500">වීඩියෝ පූරණය වෙමින් පවතී...</p>
+            <p class="text-zinc-500">පූරණය වෙමින් පවතී...</p>
         </div>
     </main>
 
-    <div id="uploadModal" class="ios-modal p-4">
-        <div class="glass w-full max-w-md p-8 rounded-[30px] relative text-center">
-            <button onclick="toggleModal()" class="absolute top-4 right-6 text-zinc-500 text-2xl">×</button>
-            <h2 class="text-2xl font-bold mb-6">වීඩියෝවක් එක් කරන්න</h2>
-            <form id="uploadForm" class="space-y-4">
-                <input type="text" id="vTitle" required placeholder="වීඩියෝවේ නම" class="w-full bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-3 outline-none">
-                <input type="url" id="vLink" required placeholder="Direct Link (GIF හෝ Video)" class="w-full bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-3 outline-none">
-                <button type="submit" class="w-full bg-white text-black font-bold py-4 rounded-2xl hover:bg-orange-500 transition">Publish Now</button>
-            </form>
-        </div>
-    </div>
-
     <script>
-        // 1. මෙතනට ඔයාගේ විස්තර දාන්න (Github එකේ තියෙන විදිහට)
+        // GitHub විස්තර
         const REPO_OWNER = 'Yuresh-Official'; 
         const REPO_NAME = 'hub'; 
         const FILE_PATH = 'videos.json';
-        const GITHUB_TOKEN = 'ඔයාගේ_Token_එක_මෙතනට'; // Token එක හරියටම පේස්ට් කරන්න
 
-        function toggleModal() {
-            document.getElementById('uploadModal').classList.toggle('active');
-        }
-
-        // 2. වීඩියෝ සහ GIF පෙන්වන කොටස
         async function loadVideos() {
             const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${FILE_PATH}`;
             try {
                 const res = await fetch(url + "?t=" + new Date().getTime());
-                if (!res.ok) throw new Error('Not found');
+                if (!res.ok) throw new Error();
                 const videos = await res.json();
                 const grid = document.getElementById('videoGrid');
                 grid.innerHTML = '';
 
-                videos.reverse().forEach(v => {
-                    // ලින්ක් එක පින්තූරයක් (GIF) ද නැත්නම් වීඩියෝවක්ද කියලා බලනවා
+                videos.reverse().forEach((v, index) => {
+                    // පින්තූරයක්ද වීඩියෝවක්ද බලනවා
                     const isImage = v.link.match(/\.(jpeg|jpg|gif|png)$/) != null || v.link.includes('tenor.com');
                     
-                    grid.innerHTML += `
-                        <div class="group cursor-pointer bg-zinc-900/30 rounded-3xl overflow-hidden border border-white/5 p-2">
-                            <div class="relative aspect-video rounded-2xl overflow-hidden">
-                                ${isImage ? 
-                                    `<img src="${v.link}" class="w-full h-full object-cover">` : 
-                                    `<video src="${v.link}" class="w-full h-full object-cover" muted></video>`
-                                }
-                                <div class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/0 transition">
-                                    <span class="text-3xl">${isImage ? '🖼️' : '▶️'}</span>
-                                </div>
+                    // Card එකක් සාදා එය Click කල විට වීඩියෝ එකේ ලින්ක් එකට යාමට සලස්වනවා
+                    const card = document.createElement('div');
+                    card.className = "video-card group cursor-pointer bg-zinc-900/40 rounded-[2rem] overflow-hidden border border-white/5 p-3 transition-all duration-300";
+                    
+                    // Card එක Click කල විට අලුත් පේජ් එකක ලින්ක් එක විවෘත වේ
+                    card.onclick = () => window.open(v.link, '_blank');
+
+                    card.innerHTML = `
+                        <div class="relative aspect-video rounded-2xl overflow-hidden bg-black">
+                            ${isImage ? 
+                                `<img src="${v.link}" class="w-full h-full object-cover">` : 
+                                `<div class="w-full h-full flex items-center justify-center bg-zinc-800 text-zinc-500">Video Player</div>`
+                            }
+                            <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition">
+                                <span class="bg-orange-500 text-black font-bold px-4 py-2 rounded-full text-xs">WATCH NOW</span>
                             </div>
-                            <div class="p-3">
-                                <h3 class="font-medium text-zinc-200 text-sm truncate">${v.title}</h3>
-                                <a href="${v.link}" target="_blank" class="text-orange-500 text-[10px] mt-1 block">View Original Link</a>
-                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-zinc-100 text-base leading-tight group-hover:text-orange-500 transition">${v.title}</h3>
+                            <p class="text-[10px] text-zinc-500 mt-2 uppercase tracking-widest">Click to view</p>
                         </div>`;
+                    
+                    grid.appendChild(card);
                 });
             } catch (e) {
-                document.getElementById('videoGrid').innerHTML = '<p class="text-zinc-500">තවමත් කිසිදු වීඩියෝවක් එක් කර නැත.</p>';
+                document.getElementById('videoGrid').innerHTML = '<p class="text-zinc-500">වීඩියෝ සොයා ගැනීමට නොහැකි විය.</p>';
             }
         }
-
-        // 3. GitHub එකට යවන කොටස
-        async function uploadToGitHub(title, link) {
-            try {
-                const getFile = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
-                    headers: { "Authorization": `token ${GITHUB_TOKEN.trim()}` }
-                });
-                const fileData = await getFile.json();
-                let currentVideos = JSON.parse(atob(fileData.content));
-                currentVideos.push({ title, link });
-
-                const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
-                    method: "PUT",
-                    headers: { "Authorization": `token ${GITHUB_TOKEN.trim()}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: "Added " + title, content: btoa(JSON.stringify(currentVideos, null, 2)), sha: fileData.sha })
-                });
-
-                if (response.ok) {
-                    alert("සාර්ථකව පළ කරන ලදී!");
-                    toggleModal();
-                    loadVideos();
-                } else {
-                    alert("Error: Token එක හෝ Repo විස්තර පරීක්ෂා කරන්න.");
-                }
-            } catch (err) { alert("Error: GitHub එකට සම්බන්ධ වීමට නොහැක."); }
-        }
-
-        document.getElementById('uploadForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            uploadToGitHub(document.getElementById('vTitle').value, document.getElementById('vLink').value);
-        });
 
         window.onload = loadVideos;
     </script>
