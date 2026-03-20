@@ -8,71 +8,65 @@
     <style>
         body { background-color: #000; color: #fff; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .video-card:hover { transform: translateY(-5px); border-color: #f97316; }
-        .stat-badge { background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.3); }
-
-        /* අවුරුදු Animation සහ සුබපැතුම් styles */
+        
+        /* අවුරුදු Splash Screen */
         #splashScreen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #fce7b4; /* අවුරුදු තේමාවට ගැලපෙන කහ පාටක් */
-            z-index: 1000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            opacity: 1; transition: opacity 1s ease, visibility 1s ease;
+            position: fixed; inset: 0; 
+            background: linear-gradient(to bottom, #fde68a, #f97316); /* අවුරුදු තේමාවට කහ සහ තැඹිලි */
+            z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 1s ease-out;
         }
-        #splashScreen.hidden { opacity: 0; visibility: hidden; }
-
-        .swing-animation {
-            width: 200px; /* ඇනිමේෂන් එකේ විශාලත්වය */
-            height: auto;
-            transform-origin: top center;
-            animation: swing 2s ease-in-out infinite alternate;
+        
+        .avurudu-container { text-align: center; position: relative; }
+        
+        /* ඔංචිලි පදින ඇනිමේෂන් එකක් වැනි චලනයක් */
+        .swing-girl {
+            width: 280px; height: auto;
+            animation: avuruduSwing 3s ease-in-out infinite;
         }
-
-        @keyframes swing {
-            0% { transform: rotate(-15deg); }
-            100% { transform: rotate(15deg); }
-        }
-
-        .wishes-text {
-            font-family: 'Times New Roman', Times, serif; /* සිංහල අකුරු සඳහා ගැලපෙන font එකක් */
-            font-size: 3rem; font-weight: bold; color: #b91c1c; /* රතු පාට */
-            margin-top: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            opacity: 0; animation: fadeIn 1.5s ease 0.5s forwards;
+        
+        @keyframes avuruduSwing {
+            0% { transform: rotate(-10deg) translateY(0); }
+            50% { transform: rotate(10deg) translateY(-20px); }
+            100% { transform: rotate(-10deg) translateY(0); }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .wishes {
+            font-size: 2.5rem; font-weight: 900; color: #7c2d12;
+            margin-top: 20px; text-shadow: 0 2px 10px rgba(255,255,255,0.5);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
     </style>
 </head>
 <body class="font-sans">
 
     <div id="splashScreen">
-        <img src="https://media1.tenor.com/m/fXjXU0iO34sAAAAC/sinhala-new-year-subha-aluth-avuruddak-wewa.gif" alt="Sinhala New Year Swing" class="swing-animation">
+        <div class="avurudu-container">
+            <img src="https://i.ibb.co/LzNf9Pz/avurudu-cartoon.png" onerror="this.src='https://media.tenor.com/fXjXU0iO34sAAAAC/sinhala-new-year-subha-aluth-avuruddak-wewa.gif'" class="swing-girl">
+            <h1 class="wishes">සුබ අලුත් අවුරුද්දක් වේවා!</h1>
+            <p class="text-orange-900 font-bold mt-2">රබන් සුරල් මැදින් කොහා ඇහෙන අවුරුද්දක්...</p>
+        </div>
         
-        <h1 class="wishes-text">සුබ අලුත් අවුරුද්දක් වේවා!</h1>
+        <audio id="kohaSound" loop>
+            <source src="https://www.soundboard.com/handler/DownLoadTrack.ashx?cliptoken=... " type="audio/mpeg">
+        </audio>
     </div>
 
     <nav class="sticky top-0 z-50 glass px-6 py-4 flex flex-col items-center gap-2">
         <h1 class="text-3xl font-black tracking-tighter text-orange-500">LANKA<span class="bg-orange-500 text-black px-1.5 rounded ml-1">HUB</span></h1>
-        
-        <div class="stat-badge px-4 py-1 rounded-full flex items-center gap-2">
-            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            <span class="text-[11px] font-bold text-orange-200 uppercase tracking-widest">
-                Total Visitors: <span id="visitorCount">...</span>
-            </span>
+        <div class="bg-orange-500/10 border border-orange-500/30 px-4 py-1 rounded-full">
+            <span id="visitorCount" class="text-xs font-bold text-orange-500 uppercase">Visitors: ...</span>
         </div>
     </nav>
 
     <main class="max-w-7xl mx-auto p-6">
-        <h2 class="text-xl font-bold mb-10 flex items-center gap-2">
-            <span class="w-1.5 h-6 bg-orange-500 rounded-full"></span> අලුත්ම නිර්මාණ
-        </h2>
-
         <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            <p class="text-zinc-500 text-center col-span-full">පූරණය වෙමින් පවතී...</p>
-        </div>
+            </div>
     </main>
 
     <script>
@@ -80,65 +74,44 @@
         const REPO_NAME = 'hub'; 
         const FILE_PATH = 'videos.json';
 
-        // SplashScreen එක පෙන්වන කාලය පාලනය කිරීම
-        function hideSplashScreen() {
+        // Splash screen එක අයින් කිරීම
+        window.onload = () => {
+            loadVideos();
+            setupVisitorCount();
+            
             setTimeout(() => {
-                document.getElementById('splashScreen').classList.add('hidden');
-            }, 3000); // තත්පර 3කට පස්සේ SplashScreen එක අයින් වෙනවා (3000ms = 3s)
-        }
-
-        function setupVisitorCount() {
-            let count = localStorage.getItem('visitor_count') || 0;
-            if (!sessionStorage.getItem('is_new_session')) {
-                count = parseInt(count) + 1;
-                localStorage.setItem('visitor_count', count);
-                sessionStorage.setItem('is_new_session', 'true');
-            }
-            document.getElementById('visitorCount').innerText = count;
-        }
+                const splash = document.getElementById('splashScreen');
+                splash.style.opacity = '0';
+                setTimeout(() => splash.style.display = 'none', 1000);
+            }, 4000); // තත්පර 4ක් පෙන්වයි
+        };
 
         async function loadVideos() {
             const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${FILE_PATH}`;
             try {
                 const res = await fetch(url + "?t=" + new Date().getTime());
-                if (!res.ok) throw new Error();
                 const videos = await res.json();
                 const grid = document.getElementById('videoGrid');
                 grid.innerHTML = '';
-
-                videos.reverse().forEach((v) => {
-                    const isImage = v.link.match(/\.(jpeg|jpg|gif|png)$/) != null || v.link.includes('tenor.com');
-                    
+                videos.reverse().forEach(v => {
                     const card = document.createElement('div');
-                    card.className = "video-card group cursor-pointer bg-zinc-900/40 rounded-[2rem] overflow-hidden border border-white/5 p-3 transition-all duration-300";
+                    card.className = "bg-zinc-900/50 p-4 rounded-3xl border border-white/5 cursor-pointer hover:border-orange-500 transition-all";
                     card.onclick = () => window.open(v.link, '_blank');
-
-                    card.innerHTML = `
-                        <div class="relative aspect-video rounded-2xl overflow-hidden bg-black">
-                            ${isImage ? 
-                                `<img src="${v.link}" class="w-full h-full object-cover">` : 
-                                `<div class="w-full h-full flex items-center justify-center bg-zinc-800 text-zinc-500">Watch Video</div>`
-                            }
-                            <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition">
-                                <span class="bg-orange-500 text-black font-bold px-4 py-2 rounded-full text-xs">WATCH NOW</span>
-                            </div>
-                        </div>
-                        <div class="p-4 text-center">
-                            <h3 class="font-semibold text-zinc-100 text-base leading-tight group-hover:text-orange-500 transition">${v.title}</h3>
-                        </div>`;
-                    
+                    card.innerHTML = `<h3 class="text-center font-bold">${v.title}</h3>`;
                     grid.appendChild(card);
                 });
-            } catch (e) {
-                document.getElementById('videoGrid').innerHTML = '<p class="text-zinc-500 text-center col-span-full">වීඩියෝ සොයා ගැනීමට නොහැකි විය.</p>';
-            }
+            } catch (e) { console.log("Load error"); }
         }
 
-        window.onload = () => {
-            loadVideos();
-            setupVisitorCount();
-            hideSplashScreen(); // SplashScreen එක පෙන්වීමට call කරනවා
-        };
+        function setupVisitorCount() {
+            let count = localStorage.getItem('v_count') || 0;
+            if (!sessionStorage.getItem('s')) {
+                count++;
+                localStorage.setItem('v_count', count);
+                sessionStorage.setItem('s', '1');
+            }
+            document.getElementById('visitorCount').innerText = "Total Visitors: " + count;
+        }
     </script>
 </body>
 </html>
