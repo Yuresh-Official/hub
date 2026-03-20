@@ -6,13 +6,53 @@
     <title>LankaHub - Videos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #000; color: #fff; }
+        body { background-color: #000; color: #fff; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .video-card:hover { transform: translateY(-5px); border-color: #f97316; }
         .stat-badge { background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.3); }
+
+        /* අවුරුදු Animation සහ සුබපැතුම් styles */
+        #splashScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #fce7b4; /* අවුරුදු තේමාවට ගැලපෙන කහ පාටක් */
+            z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 1; transition: opacity 1s ease, visibility 1s ease;
+        }
+        #splashScreen.hidden { opacity: 0; visibility: hidden; }
+
+        .swing-animation {
+            width: 200px; /* ඇනිමේෂන් එකේ විශාලත්වය */
+            height: auto;
+            transform-origin: top center;
+            animation: swing 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes swing {
+            0% { transform: rotate(-15deg); }
+            100% { transform: rotate(15deg); }
+        }
+
+        .wishes-text {
+            font-family: 'Times New Roman', Times, serif; /* සිංහල අකුරු සඳහා ගැලපෙන font එකක් */
+            font-size: 3rem; font-weight: bold; color: #b91c1c; /* රතු පාට */
+            margin-top: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            opacity: 0; animation: fadeIn 1.5s ease 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body class="font-sans">
+
+    <div id="splashScreen">
+        <img src="https://media1.tenor.com/m/fXjXU0iO34sAAAAC/sinhala-new-year-subha-aluth-avuruddak-wewa.gif" alt="Sinhala New Year Swing" class="swing-animation">
+        
+        <h1 class="wishes-text">සුබ අලුත් අවුරුද්දක් වේවා!</h1>
+    </div>
 
     <nav class="sticky top-0 z-50 glass px-6 py-4 flex flex-col items-center gap-2">
         <h1 class="text-3xl font-black tracking-tighter text-orange-500">LANKA<span class="bg-orange-500 text-black px-1.5 rounded ml-1">HUB</span></h1>
@@ -40,25 +80,23 @@
         const REPO_NAME = 'hub'; 
         const FILE_PATH = 'videos.json';
 
-        // 1. Visitor Counter එක වැඩ කරන හැටි
-        // සටහන: මෙය Unique Visitors පෙන්වීමට Tinybird හෝ එවැනි API එකක් භාවිතා කරයි.
-        // දැනට සරලම ක්‍රමය ලෙස localStorage භාවිතයෙන් මෙය පෙන්වමු.
+        // SplashScreen එක පෙන්වන කාලය පාලනය කිරීම
+        function hideSplashScreen() {
+            setTimeout(() => {
+                document.getElementById('splashScreen').classList.add('hidden');
+            }, 3000); // තත්පර 3කට පස්සේ SplashScreen එක අයින් වෙනවා (3000ms = 3s)
+        }
+
         function setupVisitorCount() {
             let count = localStorage.getItem('visitor_count') || 0;
-            
-            // පළමු වතාවට එන කෙනෙක් නම් පමණක් count එක වැඩි කරන්න
             if (!sessionStorage.getItem('is_new_session')) {
                 count = parseInt(count) + 1;
                 localStorage.setItem('visitor_count', count);
                 sessionStorage.setItem('is_new_session', 'true');
             }
-            
-            // සැබෑ ලෝකයේදී මීට වඩා දියුණු API එකක් අවශ්‍යයි, 
-            // දැනට ඔයාගේ Browser එකේ කී දෙනෙක් ආවද කියලා පෙන්වන්න:
             document.getElementById('visitorCount').innerText = count;
         }
 
-        // 2. වීඩියෝ ලෝඩ් කරන හැටි
         async function loadVideos() {
             const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${FILE_PATH}`;
             try {
@@ -99,6 +137,7 @@
         window.onload = () => {
             loadVideos();
             setupVisitorCount();
+            hideSplashScreen(); // SplashScreen එක පෙන්වීමට call කරනවා
         };
     </script>
 </body>
