@@ -3,68 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yuresh Invoice Generator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <title>LankaHub - Share Your Videos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .invoice-box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h2 { text-align: center; color: #1a73e8; margin-bottom: 20px; }
-        label { display: block; margin-top: 10px; font-weight: bold; color: #555; }
-        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
-        button { width: 100%; padding: 15px; background-color: #1a73e8; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 25px; transition: background 0.3s; }
-        button:hover { background-color: #1557b0; }
+        body { background-color: #000; color: #fff; scroll-behavior: smooth; }
+        /* iOS Glassmorphism Style */
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .ios-modal { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; }
+        .ios-modal.active { display: flex; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body>
+<body class="font-sans">
 
-<div class="invoice-box">
-    <h2>ඉන්වොයිස් ජෙනරේටර්</h2>
-    
-    <label>පාරිභෝගිකයාගේ නම:</label>
-    <input type="text" id="name" placeholder="නම ඇතුළත් කරන්න">
-
-    <label>භාණ්ඩයේ විස්තරය:</label>
-    <input type="text" id="item" placeholder="භාණ්ඩයේ නම">
-
-    <label>මිල (රුපියල්):</label>
-    <input type="number" id="price" placeholder="0.00">
-
-    <label>ප්‍රමාණය:</label>
-    <input type="number" id="qty" placeholder="1">
-
-    <button onclick="generatePDF()">PDF එකක් ලබාගන්න</button>
-</div>
-
-<script>
-    function generatePDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        const name = document.getElementById('name').value;
-        const item = document.getElementById('item').value;
-        const price = document.getElementById('price').value;
-        const qty = document.getElementById('qty').value;
-        const total = price * qty;
-
-        // PDF එකේ අන්තර්ගතය සැකසීම
-        doc.setFontSize(22);
-        doc.text("INVOICE", 105, 20, { align: 'center' });
+    <nav class="sticky top-0 z-50 glass px-6 py-4 flex justify-between items-center">
+        <h1 class="text-2xl font-black tracking-tighter text-orange-500">
+            LANKA<span class="bg-orange-500 text-black px-1.5 rounded ml-1">HUB</span>
+        </h1>
         
-        doc.setFontSize(12);
-        doc.text("පාරිභෝගිකයා: " + name, 20, 40);
-        doc.text("------------------------------------------", 20, 45);
-        doc.text("භාණ්ඩය: " + item, 20, 55);
-        doc.text("ඒකක මිල: රු. " + price, 20, 65);
-        doc.text("ප්‍රමාණය: " + qty, 20, 75);
-        doc.text("------------------------------------------", 20, 80);
-        
-        doc.setFontSize(14);
-        doc.text("මුළු එකතුව: රු. " + total + ".00", 20, 95);
+        <div class="flex items-center gap-4">
+            <button onclick="toggleModal()" class="bg-orange-500 text-black font-bold px-5 py-2 rounded-full text-sm hover:scale-105 transition active:scale-95">
+                + Upload
+            </button>
+        </div>
+    </nav>
 
-        // PDF එක සේව් කිරීම
-        doc.save(name + "_invoice.pdf");
-    }
-</script>
+    <main class="max-w-7xl mx-auto p-6">
+        <h2 class="text-xl font-bold mb-8 flex items-center gap-2">
+            <span class="w-1.5 h-6 bg-orange-500 rounded-full"></span>
+            Community Videos
+        </h2>
 
+        <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            </div>
+    </main>
+
+    <div id="uploadModal" class="ios-modal p-4">
+        <div class="glass w-full max-w-md p-8 rounded-[30px] relative">
+            <button onclick="toggleModal()" class="absolute top-4 right-6 text-zinc-500 text-2xl">×</button>
+            
+            <h2 class="text-2xl font-bold mb-2 text-center">Upload Video</h2>
+            <p class="text-zinc-400 text-sm text-center mb-6">ඔබේ වීඩියෝ විස්තර ඇතුළත් කරන්න.</p>
+
+            <form id="uploadForm" class="space-y-4">
+                <input type="text" id="vTitle" required placeholder="වීඩියෝවේ නම (Title)" 
+                       class="w-full bg-zinc-900/50 border border-zinc-700 rounded-2xl px-4 py-3 focus:outline-none focus:border-orange-500 transition">
+                
+                <input type="url" id="vLink" required placeholder="වීඩියෝ ලින්ක් එක (Link)" 
+                       class="w-full bg-zinc-900/50 border border-zinc-700 rounded-2xl px-4 py-3 focus:outline-none focus:border-orange-500 transition">
+                
+                <button type="submit" class="w-full bg-white text-black font-bold py-4 rounded-2xl mt-4 hover:bg-orange-500 hover:text-white transition">
+                    Publish Now
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- මෙතනට ඔයාගේ විස්තර දාන්න ---
+        const REPO_OWNER = 'Yuresh-Official'; 
+        const REPO_NAME = 'hub'; 
+        const FILE_PATH = 'videos.json';
+        const GITHUB_TOKEN = 'ඔයාගේ_TOKEN_එක_මෙතනට'; // Vercel එකේ වැඩ කරන්න නම් මේක මෙතනට දාන්න
+
+        function toggleModal() {
+            document.getElementById('uploadModal').classList.toggle('active');
+        }
+
+        // 1. වීඩියෝ පෙන්වන Function එක
+        async function loadVideos() {
+            const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${FILE_PATH}`;
+            try {
+                const res = await fetch(url + "?t=" + new Date().getTime()); // Cache නොවෙන්න Time එකක් දානවා
+                const videos = await res.json();
+                const grid = document.getElementById('videoGrid');
+                grid.innerHTML = '';
+
+                videos.reverse().forEach(v => {
+                    grid.innerHTML += `
+                        <div class="group cursor-pointer">
+                            <div class="relative aspect-video rounded-3xl overflow-hidden border border-white/10 transition-transform group-hover:scale-105">
+                                <img src="https://via.placeholder.com/500x280/111/fff?text=LankaHub" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 flex items-center justify-center bg-black/40">
+                                    <span class="text-4xl">▶️</span>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <h3 class="font-medium text-zinc-200">${v.title}</h3>
+                                <a href="${v.link}" target="_blank" class="text-orange-500 text-xs mt-1">නරඹන්න ක්ලික් කරන්න</a>
+                            </div>
+                        </div>`;
+                });
+            } catch (e) { console.log("No videos found yet."); }
+        }
+
+        // 2. වීඩියෝ එකක් GitHub වෙත යැවීම
+        async function uploadToGitHub(title, link) {
+            const getFile = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
+                headers: { "Authorization": `token ${GITHUB_TOKEN}` }
+            });
+            const fileData = await getFile.json();
+            const sha = fileData.sha;
+            let currentVideos = JSON.parse(atob(fileData.content));
+
+            currentVideos.push({ title, link, date: new Date().toISOString() });
+            const updatedContent = btoa(JSON.stringify(currentVideos, null, 2));
+
+            const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
+                method: "PUT",
+                headers: { "Authorization": `token ${GITHUB_TOKEN}`, "Content-Type": "application/json" },
+                body: JSON.stringify({ message: "Added new video", content: updatedContent, sha: sha })
+            });
+
+            if (response.ok) {
+                alert("සාර්ථකයි! වීඩියෝව පළ කරන ලදී.");
+                toggleModal();
+                loadVideos();
+            }
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            uploadToGitHub(document.getElementById('vTitle').value, document.getElementById('vLink').value);
+        });
+
+        window.onload = loadVideos;
+    </script>
 </body>
 </html>
